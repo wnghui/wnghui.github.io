@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://api.map.baidu.com/api?v=3.0&type=webgl&ak=00EvVBGyqOZLhHln2lVLESrPXSyU5fIQ"></script>
+    <style>
+        #list {
+            padding: 0;
+            width: 1200px;
+            margin: 0 auto;
+        }
+
+        #list li {
+            list-style: none;
+            padding: 30px;
+            margin: 5px 0;
+            border-radius: 20px;
+            box-shadow: 0 0 10 #999;
+        }
+
+        body {
+            margin: 0;
+            padding: 0
+        }
+
+        #map {
+            position: fixed !important;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100vh;
+            /* display: none; */
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <input type="text" placeholder="城市" id="address">
+        <input type="text" placeholder="地点" id="type">
+        <button id="submit">搜索</button>
+    </div>
+    <ul id="list">
+
+    </ul>
+    <div id="map"></div>
+</body>
+<script>
+    var results = [];
+
+    // 请求成功的回调函数
+    function fun(res) {
+        results = res.results;
+        res = res.results;
+
+        var html = "";
+        for (var i = 0; i < res.length; i++) {
+
+            html += "<li><h3>" + res[i].name + "</h3><p>地址：" + res[i].address + "</p><p>电话：" + (res[i].telephone ? res[i].telephone : '无') + "</p><button index='" + i + "'>查看位置</button></li>"
+
+        }
+        list.innerHTML = html;
+    }
+
+    submit.onclick = function () {
+
+        var node = document.createElement("script");
+        node.src = "http://api.map.baidu.com/place/v2/search?query=" + type.value + "&region=" + address.value + "&output=json&ak=zD3EpMH9UPkEn8rYdQrc2OFwD2uaz49o&callback=fun"
+        document.body.appendChild(node);
+
+    }
+
+    // 查看位置
+    list.onclick = function (e) {
+        // 如果符合此条件 说明e.target为button
+        if (e.target.nodeName == "BUTTON") {
+            var index = e.target.getAttribute("index");
+            console.log(results[index])
+
+            // 获取按钮携带的经纬度信息
+            var lng = results[index].location.lng;
+            var lat = results[index].location.lat;
+            // console.log(results[index].location.lng)
+
+            var mapEl = document.getElementById("map");
+            mapEl.style.left = "0"
+            map.clearOverlays();
+            var point = new BMapGL.Point(lng, lat);
+            var marker = new BMapGL.Marker(point);
+            map.addOverlay(marker);
+            map.setCenter(point)
+
+            var name = results[index].name
+
+            var address = results[index].address
+
+            marker.addEventListener("click", function (e) {
+                // 阻止冒泡
+                e.domEvent.stopPropagation();
+
+                var opts = {
+                    width: 250,     // 信息窗口宽度    
+                    height: 100,     // 信息窗口高度    
+                    title: name  // 信息窗口标题   
+                }
+                var infoWindow = new BMapGL.InfoWindow(address, opts);  // 创建信息窗口对象    
+                map.openInfoWindow(infoWindow,  point);      // 打开信息窗口
+
+            })
+
+        }
+
+    }
+
+    // 绘制地图
+    var map = new BMapGL.Map("map");
+    var point = new BMapGL.Point(113.669742, 34.751122);
+
+    map.centerAndZoom(point, 15);
+
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+
+
+</script>
+
+</html>

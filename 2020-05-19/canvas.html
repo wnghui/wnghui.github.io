@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #can {
+            box-shadow: 0 0 10px #999;
+            margin-left: 500px;
+            margin-top: 200px;
+        }
+        #ipt{
+            margin-left: 530px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 300*150 -->
+    <canvas id="can"></canvas><br>
+    <input type="text" id="ipt" placeholder="验证码">
+    <button id="affirm">验证</button>
+</body>
+<script>
+    // Math.random() 0-1 包括0 不包括1
+    var str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    function random(a, b) {
+        return Math.floor(Math.random() * (b - a + 1)) + a
+    }
+    var code="";
+    
+    function render() {
+
+        code = "";
+        // 随机拼接6个字符
+        for (var i = 0; i < 6; i++) {
+            code += str[random(0, str.length - 1)];
+        }
+
+        
+
+        // 获取绘制对象
+        var ctx = can.getContext("2d");
+
+        // 清空画布
+        ctx.clearRect(0,0,300,150);
+
+        // 线
+        for (var i = 0; i < 100; i++) {
+
+            // 随机颜色
+            ctx.strokeStyle = "rgba(" + random(0, 255) + "," + random(0, 255) + "," + random(0, 255) + "," + Math.random() + ")"
+
+            ctx.beginPath();
+            ctx.lineWidth = random(1, 3);
+            ctx.moveTo(random(-50, 350), random(-50, 200))
+            ctx.lineTo(random(-50, 350), random(-50, 200))
+            ctx.stroke();
+
+        }
+
+        // 圆
+
+        for (var i = 0; i < 100; i++) {
+
+            // 随机颜色
+            ctx.fillStyle = "rgba(" + random(0, 255) + "," + random(0, 255) + "," + random(0, 255) + "," + Math.random() + ")"
+
+            ctx.beginPath();
+
+            ctx.arc(random(-50, 350), random(-50, 200), random(2, 10), 0, Math.PI * 2);
+
+            ctx.fill();
+
+        }
+
+        // 绘制文字
+
+        for (var i = 0; i < code.length; i++) {
+
+            ctx.font = random(30, 80) + "px 微软雅黑"
+            // 随机颜色
+            ctx.fillStyle = "rgba(" + random(0, 125) + "," + random(0, 125) + "," + random(0, 125) + "," + random(5, 10) / 10 + ")"
+            // 上下居中
+            ctx.textBaseline = "middle";
+
+            ctx.fillText(code[i], 50 * i + 10, 75);
+
+
+        }
+    }
+
+    render();
+
+    can.onclick=render;
+
+    console.log(code)
+
+    var ipt = document.getElementById("ipt")
+
+    affirm.onclick = function(){
+
+        code = code.toLowerCase();
+
+        if(ipt.value == code){
+            alert("输入正确")
+        }else{
+            alert("输入错误")
+        }
+        console.log(ipt.value)
+    }
+    
+</script>
+
+</html>
